@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python3_lamb",
-    version="0.0.1",
+    version="0.0.2",
     description="advance lib of python usage.",
     author="redrose2100",
     author_email="hitredrose@163.com",
