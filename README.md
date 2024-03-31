@@ -1,2 +1,7 @@
 # lambkid
-an advance layer abstract of python usage, aim to supply a more easy and useful lib
+
+## install lambkid
+refer to [install lambkid](docs/install.md)
+
+## function of lambkid
+* [log](docs/log.md) (>0.0.3)

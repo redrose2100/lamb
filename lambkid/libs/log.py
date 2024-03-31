@@ -3,11 +3,12 @@ import platform
 from pathlib import Path
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-def get_logger(name,level=logging.INFO,log_path=None):
-    sys_name=platform.system()
+
+def get_logger(name, level=logging.INFO, log_path=None):
+    sys_name = platform.system()
     if not log_path:
         if sys_name == "Linux":
-            log_path=f"/var/log/{name}/lambkid.log"
+            log_path = f"/var/log/{name}/lambkid.log"
         else:
             log_path = Path(__file__).parent / "lambkid.log"
     handler = ConcurrentRotatingFileHandler(log_path, "a", 512 * 1024, 30)
@@ -18,10 +19,11 @@ def get_logger(name,level=logging.INFO,log_path=None):
     logger.propagate = False
     return logger
 
-log=get_logger("lambkid")
 
-if __name__=="__main__":
-    log=get_logger("redrose2100")
+log = get_logger("lambkid")
+
+if __name__ == "__main__":
+    log = get_logger("redrose2100")
     log.debug("test debug log")
     log.info("test info log")
     log.warning("test warning log")
