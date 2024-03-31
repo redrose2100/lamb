@@ -2,17 +2,14 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="lamb",
+    name="lambkid",
     version="0.0.1",
     description="advance lib of python usage.",
     author="redrose2100",
     author_email="hitredrose@163.com",
     maintainer="redrose2100",
     maintainer_email="hitredrose@163.com",
-    url="https://github.com/redrose2100/lamb",
-    install_require=[
-        "concurrent-log-handler"
-    ],
+    url="https://github.com/redrose2100/lambkid",
     license="MIT",
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -29,9 +26,9 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.12'
     ],
     packages=[
-        "lamb"
+        "lambkid"
     ],
 )

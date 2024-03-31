@@ -7,9 +7,9 @@ def get_logger(name,level=logging.INFO,log_path=None):
     sys_name=platform.system()
     if not log_path:
         if sys_name == "Linux":
-            log_path=f"/var/log/{name}/lamb.log"
+            log_path=f"/var/log/{name}/lambkid.log"
         else:
-            log_path = Path(__file__).parent / "lamb.log"
+            log_path = Path(__file__).parent / "lambkid.log"
     handler = ConcurrentRotatingFileHandler(log_path, "a", 512 * 1024, 30)
     handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
     logger = logging.getLogger(name)
@@ -18,7 +18,7 @@ def get_logger(name,level=logging.INFO,log_path=None):
     logger.propagate = False
     return logger
 
-log=get_logger("lamb")
+log=get_logger("lambkid")
 
 if __name__=="__main__":
     log=get_logger("redrose2100")
