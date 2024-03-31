@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambkid",
-    version="0.0.1",
+    version="0.0.2",
     description="advance lib of python usage.",
     author="redrose2100",
     author_email="hitredrose@163.com",
@@ -11,6 +11,9 @@ setup(
     maintainer_email="hitredrose@163.com",
     url="https://github.com/redrose2100/lambkid",
     license="MIT",
+    install_requires =[
+        "concurrent_log_handler"
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
