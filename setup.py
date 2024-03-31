@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambkid",
-    version="0.0.3",
+    version="0.0.4",
     description="advance lib of python usage.",
     author="redrose2100",
     author_email="hitredrose@163.com",
@@ -31,7 +31,5 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12'
     ],
-    packages=[
-        "lambkid"
-    ],
+    packages=find_packages()
 )
