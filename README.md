@@ -4,4 +4,5 @@
 refer to [install lambkid](docs/install.md)
 
 ## function of lambkid
-* [log](docs/log.md) (>0.0.4)
+* [sshclient](docs/sshclient.md)(>=0.0.6)
+* [log](docs/log.md) (>==0.0.4)

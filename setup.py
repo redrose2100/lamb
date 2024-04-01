@@ -1,10 +1,22 @@
 from setuptools import setup, find_packages
 
+try:
+    with open("VERSION",encoding="utf-8",mode="r") as f:
+        version=f.read().strip()
+except:
+    version="version is empty"
+
+try:
+    with open("README.md",encoding="utf-8",mode="r") as f:
+        long_desc=f.read()
+except:
+    long_desc=""
 
 setup(
     name="lambkid",
-    version="0.0.4",
+    version=version,
     description="advance lib of python usage.",
+    long_description=long_desc,
     author="redrose2100",
     author_email="hitredrose@163.com",
     maintainer="redrose2100",
@@ -12,7 +24,8 @@ setup(
     url="https://github.com/redrose2100/lambkid",
     license="MIT",
     install_requires =[
-        "concurrent_log_handler"
+        "concurrent_log_handler",
+        "paramiko"
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

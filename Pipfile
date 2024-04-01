@@ -7,6 +7,9 @@ name = "pypi"
 setuptools = "*"
 concurrent-log-handler = "*"
 twine = "*"
+fabric = "*"
+paramiko = "*"
+pexpect = "*"
 
 [dev-packages]
 

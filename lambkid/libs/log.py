@@ -13,7 +13,11 @@ def get_logger(name, level=logging.INFO, log_path=None):
             log_path = Path(__file__).parent / "lambkid.log"
     handler = ConcurrentRotatingFileHandler(log_path, "a", 512 * 1024, 30)
     handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
     logger = logging.getLogger(name)
+    logger.addHandler(console_handler)
     logger.addHandler(handler)
     logger.setLevel(level)
     logger.propagate = False
