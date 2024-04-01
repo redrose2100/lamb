@@ -25,6 +25,9 @@ setup(
     maintainer="redrose2100",
     maintainer_email="hitredrose@163.com",
     url="https://github.com/redrose2100/lambkid",
+    project_urls={
+        "Documentation": "https://github.com/redrose2100/lambkid/blob/master/README.md"
+    },
     license="MIT",
     install_requires =[
         "concurrent_log_handler",
