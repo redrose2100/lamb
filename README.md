@@ -1,5 +1,8 @@
 # lambkid
 
+lambkid is an advance lib abstract from some common use python lib. it aim to supply a more easily and more fewer code for python developer.
+it will practise for life is short and I will choose python.
+
 ## install lambkid
 refer to [install lambkid](docs/install.md)
 
