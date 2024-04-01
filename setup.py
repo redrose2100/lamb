@@ -13,15 +13,6 @@ try:
 except:
     long_desc=""
 
-def find_markdown_files(directory):
-    markdown_files = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file.endswith(".md"):
-                markdown_files.append(os.path.relpath(os.path.join(root, file), directory))
-    return markdown_files
-
-docs_markdown_files = find_markdown_files("docs")
 
 setup(
     name="lambkid",
@@ -39,7 +30,7 @@ setup(
         "concurrent_log_handler",
         "paramiko"
     ],
-    package_data={"": docs_markdown_files},
+    include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
