@@ -1,3 +1,4 @@
+import os
 import logging
 import platform
 from pathlib import Path
@@ -8,6 +9,7 @@ def get_logger(name, level=logging.INFO, log_path=None):
     sys_name = platform.system()
     if not log_path:
         if sys_name == "Linux":
+            os.system(f"mkdir -p /var/log/{name}")
             log_path = f"/var/log/{name}/lambkid.log"
         else:
             log_path = Path(__file__).parent / "lambkid.log"

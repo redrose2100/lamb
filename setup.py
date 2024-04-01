@@ -1,11 +1,6 @@
 import os
 from setuptools import setup, find_packages
 
-try:
-    with open("VERSION",encoding="utf-8",mode="r") as f:
-        version=f.read().strip()
-except:
-    version="version is empty"
 
 try:
     with open("README.md",encoding="utf-8",mode="r") as f:
@@ -16,7 +11,7 @@ except:
 
 setup(
     name="lambkid",
-    version=version,
+    version="0.0.12",
     description="lambkid is an advance abstract from some common pyton lib, it aim to make you write python more easily and more fewer code.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
