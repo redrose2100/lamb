@@ -21,7 +21,7 @@ class ExecResult(object):
         return self.__exit_status_code
 
 class SSHClient(object):
-    def __init__(self, ip, port, username, password, keep_alive_interval=60, connect_timeout=60):
+    def __init__(self, ip="127.0.0.1", port=22, username="root", password="", keep_alive_interval=60, connect_timeout=60):
         self.__ip = ip
         self.__port = port
         self.__username = username
