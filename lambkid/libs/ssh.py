@@ -31,6 +31,11 @@ class SSHClient(object):
         self.__ssh = None
         self.__scp = None
         self.__sftp = None
+
+    @property
+    def ip(self):
+        return self.__ip
+
     def wait_for_sshable(self,timeout=120):
         count=0
         while True:
