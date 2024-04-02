@@ -70,8 +70,8 @@ class SSHClient(object):
             if exit_status_code == 0:
                 log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {output}")
             else:
-                log.error(
-                    f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, output is {output},exit_status_code is {exit_status_code}")
+                log.warning(
+                    f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {exit_status_code}, output is {output},")
             rs = ExecResult(output, exit_status_code)
             return rs
         except Exception as e:
