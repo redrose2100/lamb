@@ -36,6 +36,10 @@ class SSHClient(object):
     def ip(self):
         return self.__ip
 
+    @property
+    def port(self):
+        return self.__port
+
     def wait_for_sshable(self,timeout=120):
         count=0
         while True:
