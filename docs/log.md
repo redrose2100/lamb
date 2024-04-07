@@ -8,7 +8,7 @@ details refer to [install lambkid](install.md)
 
 * usage 1: Use log with default config
   In this case, log level default is logging.INFO, log path default is
-  {path_of_python_in_your_machine}/Lib\site-packages/lambkid/lambkid.log in windows and /var/log/lambkid/lambkid.log in
+  {path_of_python_in_your_machine}/Lib\site-packages/lambkid/lambkid_YYYYMMDD.log in windows and /var/log/lambkid/lambkid.log in
   linux or mac.
 
 ```python

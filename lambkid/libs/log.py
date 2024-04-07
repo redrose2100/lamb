@@ -8,7 +8,7 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 def get_logger(name, level=logging.INFO, log_path=None):
     sys_name = platform.system()
-    timestamp = datetime.now().strftime("%Y-%m-%d")
+    timestamp = datetime.now().strftime("%Y%m%d")
     if not log_path:
         if sys_name == "Linux":
             os.system(f"mkdir -p /var/log/{name}")
