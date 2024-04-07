@@ -11,7 +11,7 @@ except:
 
 setup(
     name="lambkid",
-    version="0.0.19",
+    version="0.0.20",
     description="lambkid is an advance abstract from some common pyton lib, it aim to make you write python more easily and more fewer code.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
