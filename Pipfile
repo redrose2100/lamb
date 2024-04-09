@@ -10,6 +10,8 @@ twine = "*"
 fabric = "*"
 paramiko = "*"
 pexpect = "*"
+fire = "*"
+minio = "*"
 
 [dev-packages]
 

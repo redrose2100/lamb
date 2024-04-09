@@ -11,7 +11,7 @@ except:
 
 setup(
     name="lambkid",
-    version="0.1.0",
+    version="0.1.7",
     description="lambkid is an advance abstract from some common pyton lib, it aim to make you write python more easily and more fewer code.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
@@ -26,9 +26,16 @@ setup(
     license="MIT",
     install_requires =[
         "concurrent_log_handler",
-        "paramiko"
+        "paramiko",
+        "fire"
     ],
     include_package_data=True,
+    packages=find_packages(),
+    entry_points={
+        'console_scripts': [
+            'lambkid=lambkid.cli:main'
+        ],
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -45,6 +52,5 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12'
-    ],
-    packages=find_packages()
+    ]
 )
