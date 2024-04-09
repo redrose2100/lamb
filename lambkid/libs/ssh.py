@@ -24,7 +24,7 @@ class ExecResult(object):
 
 class SSHClient(object):
     def __init__(self, ip="127.0.0.1", port=22, username="root", password="", keep_alive_interval=60,
-                 connect_timeout=60):
+                 connect_timeout=1200):
         self.__ip = ip
         self.__port = port
         self.__username = username
@@ -44,7 +44,7 @@ class SSHClient(object):
     def port(self):
         return self.__port
 
-    def wait_for_sshable(self, timeout=120):
+    def wait_for_sshable(self, timeout=600):
         count = 0
         while True:
             count += 1
@@ -59,7 +59,7 @@ class SSHClient(object):
                 log.warning(f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
                 time.sleep(10)
 
-    def exec(self, cmd, timeout=60):
+    def exec(self, cmd, timeout=600):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
         try:
             if not self.__is_active():
