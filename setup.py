@@ -11,7 +11,7 @@ except:
 
 setup(
     name="lambkid",
-    version="0.1.7",
+    version="0.1.8",
     description="lambkid is an advance abstract from some common pyton lib, it aim to make you write python more easily and more fewer code.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
@@ -27,6 +27,7 @@ setup(
     install_requires =[
         "concurrent_log_handler",
         "paramiko",
+        "minio",
         "fire"
     ],
     include_package_data=True,
