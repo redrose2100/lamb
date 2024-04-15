@@ -3,6 +3,7 @@ import re
 import time
 import paramiko
 from lambkid import log
+import concurrent.futures
 
 
 class ExecResult(object):
@@ -61,23 +62,34 @@ class SSHClient(object):
 
     def exec(self, cmd, timeout=600):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
-        try:
-            if not self.__is_active():
-                self.__reconnect()
-            stdin, stdout, stderr = self.__ssh.exec_command(cmd, timeout=timeout)
-            exit_status_code = stdout.channel.recv_exit_status()
-            output = stdout.read().decode("utf-8")
-            if exit_status_code == 0:
-                log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {output}")
-            else:
-                log.warning(
-                    f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {exit_status_code}, output is {output},")
-            rs = ExecResult(output, exit_status_code)
-            return rs
-        except Exception as e:
-            log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
-            rs = ExecResult(f"fail to run cmd {cmd}: Error.err msg is {str(e)}", 255)
-            return rs
+        def _exec(cmd):
+            try:
+                if not self.__is_active():
+                    self.__reconnect()
+                stdin, stdout, stderr = self.__ssh.exec_command(cmd, timeout=timeout)
+                exit_status_code = stdout.channel.recv_exit_status()
+                output = stdout.read().decode("utf-8")
+                if exit_status_code == 0:
+                    log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {output}")
+                else:
+                    log.warning(
+                        f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {exit_status_code}, output is {output},")
+                rs = ExecResult(output, exit_status_code)
+                return rs
+            except Exception as e:
+                log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
+                rs = ExecResult(f"fail to run cmd {cmd}: Error.err msg is {str(e)}", 255)
+                return rs
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(_exec,cmd)
+            try:
+                result = future.result(timeout=timeout)
+                return result
+            except concurrent.futures.TimeoutError:
+                msg=f"timeout to run cmd: {cmd}."
+                log.error(f" {self.__ip}:{self.__port} | {msg}")
+                return msg
 
     def exec_interactive(self, cmd_prompt):
         channel = self.__ssh.invoke_shell()
