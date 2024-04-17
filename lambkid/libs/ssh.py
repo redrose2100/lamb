@@ -67,7 +67,8 @@ class SSHClient(object):
                 log.error(f" {self.__ip}:{self.__port} | {msg}")
                 return False
 
-    def exec(self, cmd, timeout=600):
+    def exec(self, cmd, timeout=600,max_attempts=1):
+        cmd_new=f"max_attempts={max_attempts}; attempts=0; until {cmd} || (( attempts++ >= max_attempts )); do echo \"Attempt $attempts of $max_attempts\"; sleep 1; done"
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
         def _exec(cmd):
             try:
@@ -89,7 +90,7 @@ class SSHClient(object):
                 return rs
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(_exec,cmd)
+            future = executor.submit(_exec,cmd_new)
             try:
                 result = future.result(timeout=timeout)
                 return result
