@@ -15,7 +15,7 @@ def get_logger(name, level=logging.INFO, log_path=None):
             log_path = f"/var/log/{name}/lambkid_{timestamp}.log"
         else:
             log_path = Path(__file__).parent / f"lambkid_{timestamp}.log"
-    handler = ConcurrentRotatingFileHandler(log_path, "a", 512 * 1024 * 1024, 30)
+    handler = ConcurrentRotatingFileHandler(log_path, "a", 1024 * 1024, 200)
     handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
