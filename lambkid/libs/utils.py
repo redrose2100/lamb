@@ -1,5 +1,32 @@
 import csv
+from pathlib import Path
 from lambkid import log
+
+def get_all_files(root_dir, recursive=True, suffix_tuple=()):
+    all_files = []
+    if Path(root_dir).exists():
+        if Path(root_dir).is_dir():
+            if recursive:
+                for elem in Path(root_dir).glob("**/*"):
+                    if Path(elem).is_file():
+                        suffix = Path(elem).suffix
+                        if not suffix_tuple:
+                            all_files.append(elem)
+                        else:
+                            if suffix in suffix_tuple:
+                                all_files.append(elem)
+            else:
+                for elem in Path(root_dir).iterdir():
+                    if Path(elem).is_file():
+                        suffix = Path(elem).suffix
+                        if not suffix_tuple:
+                            all_files.append(elem)
+                        else:
+                            if suffix in suffix_tuple:
+                                all_files.append(elem)
+        else:
+            all_files.append(root_dir)
+    return all_files
 
 class CSV(object):
     def __init__(self):
