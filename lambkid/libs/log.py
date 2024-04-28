@@ -6,7 +6,7 @@ from datetime import datetime
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 
-def get_logger(name, level=logging.INFO, log_path=None):
+def get_logger(name, level=logging.INFO, log_path=None,open_console=True):
     sys_name = platform.system()
     timestamp = datetime.now().strftime("%Y%m%d")
     if not log_path:
@@ -18,11 +18,12 @@ def get_logger(name, level=logging.INFO, log_path=None):
     handler = ConcurrentRotatingFileHandler(log_path, "a", 1024 * 1024 * 1024, 200)
     handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
     handler.setLevel(level)
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(level)
-    console_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
     logger = logging.getLogger(name)
-    logger.addHandler(console_handler)
+    if open_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(level)
+        console_handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s'))
+        logger.addHandler(console_handler)
     logger.addHandler(handler)
     logger.propagate = False
     return logger
