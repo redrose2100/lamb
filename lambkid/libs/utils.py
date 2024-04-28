@@ -30,7 +30,7 @@ def get_all_files(root_dir, recursive=True, suffix_tuple=()):
     return all_files
 
 
-def write_csv(self,file_path, head=None, datas=None):
+def write_csv(file_path, head=None, datas=None):
     try:
         with open(file_path, "a+", encoding="utf-8", newline="") as f:
             csv_writer = csv.writer(f)
