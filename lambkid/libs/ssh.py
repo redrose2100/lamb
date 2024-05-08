@@ -46,26 +46,22 @@ class SSHClient(object):
         return self.__port
 
     def wait_for_sshable(self, timeout=600):
-        def _wait_for_sshable():
-            while True:
-                try:
-                    if self.__connect():
-                        log.info(f" {self.__ip}:{self.__port} | server {self.__ip} can ssh: OK.")
-                        return True
-                except Exception as e:
-                    log.warning(
-                        f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
-                time.sleep(10)
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(_wait_for_sshable)
-            try:
-                result = future.result(timeout=timeout)
-                return result
-            except concurrent.futures.TimeoutError:
-                msg=f"timeout to wait for sshalbe: timeout is :{timeout}."
-                log.error(f" {self.__ip}:{self.__port} | {msg}")
+        count=0
+        while True:
+            count+=1
+            if count>(timeout/10):
+                log.error(
+                    f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is in time {timeout} server cannot ssh.")
                 return False
+            try:
+                if self.__connect():
+                    log.info(f" {self.__ip}:{self.__port} | server {self.__ip} can ssh: OK.")
+                    return True
+            except Exception as e:
+                log.warning(
+                    f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
+            time.sleep(10)
+
 
     def exec(self, cmd, timeout=600,max_attempts=1):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
