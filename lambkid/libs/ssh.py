@@ -157,7 +157,7 @@ class SSHClient(object):
             log.info(f" {self.__ip}:{self.__port} | successful to create ssh connect: OK.")
             return True
         except Exception as e:
-            log.error(f" {self.__ip}:{self.__port} | fail create ssh connect: Error.err msg is {str(e)}")
+            log.warning(f" {self.__ip}:{self.__port} | fail create ssh connect: Error.err msg is {str(e)}")
             return False
 
     def __reconnect(self):
