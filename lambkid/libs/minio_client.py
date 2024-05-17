@@ -30,6 +30,5 @@ class MinIO:
             except Exception as e:
                 log.warning(
                     f"s3 file bucket_name {bucket_name} object_name {object_name} file_path {file_path} is not exist, err msg is {str(e)} Try once..")
-        log.error(
-            f"s3 file bucket_name {bucket_name} object_name {object_name} file_path {file_path} is not exist: Error.")
-        sys.exit(-1)
+                if i == max_retry-1:
+                    sys.exit(f"s3 file bucket_name {bucket_name} object_name {object_name} file_path {file_path} is not exist: Error.err msg is {str(e)}")
