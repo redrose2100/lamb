@@ -145,6 +145,46 @@ class SSHClient(object):
                 f"{self.__ip}:{self.__port} | Failed to copy file from local {local_path} to remote host {remote_path}: Error. err msg is:{str(e)}")
             raise e
 
+    def scp_file_to_remote(self, local_path, remote_path):
+        log.info(
+            f" {self.__ip}:{self.__port} | Begin to copy file from local {local_path} to remote host {remote_path} ...")
+        try:
+            if not self.__is_active():
+                self.__reconnect()
+            if not self.__sftp or not self.__scp:
+                self.__scp = paramiko.Transport((self.__ip, self.__port))
+                self.__scp.connect(username=self.__username, password=self.__password)
+                self.__sftp = paramiko.SFTPClient.from_transport(self.__scp)
+            if os.path.isfile(local_path):
+                self.__sftp.put(local_path, remote_path)
+            else:
+                log.error(f" {self.__ip}:{self.__port} | failed to copy file from local {local_path} to remote host{remote_path}: Error. for local file is not exist.")
+            log.info(
+                f" {self.__ip}:{self.__port} | Success to copy file from local {local_path} to remote host{remote_path}: OK.")
+        except Exception as e:
+            log.error(
+                f"{self.__ip}:{self.__port} | Failed to copy file from local {local_path} to remote host {remote_path}: Error. err msg is:{str(e)}")
+            raise e
+    def scp_file_to_local(self, remote_path, local_path):
+        log.info(
+            f" {self.__ip}:{self.__port} | Begin to copy file from remote {remote_path} to local host {local_path} ...")
+        try:
+            if not self.__is_active():
+                self.__reconnect()
+            if not self.__sftp or not self.__scp:
+                self.__scp = paramiko.Transport((self.__ip, self.__port))
+                self.__scp.connect(username=self.__username, password=self.__password)
+                self.__sftp = paramiko.SFTPClient.from_transport(self.__scp)
+            if os.path.isfile(local_path):
+                os.system(f"rm -rf {local_path}")
+            self.__sftp.get(remote_path,local_path)
+            log.info(
+                f" {self.__ip}:{self.__port} | Success to copy file from remote {remote_path} to local host{local_path}: OK.")
+        except Exception as e:
+            log.error(
+                f"{self.__ip}:{self.__port} | Failed to copy file from remote {remote_path} to local host {local_path}: Error. err msg is:{str(e)}")
+            raise e
+
     def __connect(self):
         log.info(f" {self.__ip}:{self.__port} | begin to create ssh connect...")
         try:
