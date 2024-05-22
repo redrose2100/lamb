@@ -30,7 +30,7 @@ def get_logger(name, level=logging.INFO, log_path=None,open_console=True):
     return logger
 
 
-# log = get_logger("lambkid")
+log = get_logger("lambkid")
 
 if __name__ == "__main__":
     log = get_logger("redrose2100")
