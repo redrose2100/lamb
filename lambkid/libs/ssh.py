@@ -78,6 +78,13 @@ class SSHClient(object):
                 else:
                     break
             stdin, stdout, stderr = self.__ssh.exec_command(cmd, timeout=timeout)
+            start_time = time.time()
+            while not stdout.channel.exit_status_ready():
+                if time.time() - start_time > timeout:
+                    stdout.channel.close()
+                    stderr.channel.close()
+                    raise TimeoutError("The command timed out.")
+                time.sleep(0.1)  # 给其他任务一些时间
             exit_status_code = stdout.channel.recv_exit_status()
             output = stdout.read().decode("utf-8")
             if exit_status_code == 0:
@@ -89,7 +96,7 @@ class SSHClient(object):
             return rs
         except Exception as e:
             log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
-            rs = ExecResult(f"fail to run cmd {cmd}: Error.err msg is {str(e)}", 255)
+            rs = ExecResult("", 255)
             return rs
 
     def exec_interactive(self, cmd_prompt):
