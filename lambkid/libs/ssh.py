@@ -250,6 +250,7 @@ class SSHClient(object):
                 return False
             is_active = self.__transport.is_active()
             if is_active:
+                self.__ssh.exec_command("ls /root/")
                 log.info(f" {self.__ip}:{self.__port} | ssh channel is active.")
                 return True
             else:
