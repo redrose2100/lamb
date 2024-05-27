@@ -207,10 +207,39 @@ class SSHClient(object):
             log.warning(f" {self.__ip}:{self.__port} | fail create ssh connect: Error.err msg is {str(e)}")
             return False
 
+    def __del__(self):
+        try:
+            self.__sftp.close()
+        except:
+            pass
+        try:
+            self.__scp.close()
+        except:
+            pass
+        try:
+            self.__transport.close()
+        except:
+            pass
+        try:
+            self.__ssh.close()
+        except:
+            pass
+
     def __reconnect(self):
         try:
-            if self.__ssh:
-                del self.__ssh
+            self.__sftp.close()
+        except:
+            pass
+        try:
+            self.__scp.close()
+        except:
+            pass
+        try:
+            self.__transport.close()
+        except:
+            pass
+        try:
+            self.__ssh.close()
         except:
             pass
         return self.__connect()
