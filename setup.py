@@ -10,7 +10,7 @@ except:
 
 setup(
     name="lambkid",
-    version="0.2.15",
+    version="0.2.25",
     description="lambkid is an advance abstract from some common pyton lib, it aim to make you write python more easily and more fewer code.",
     long_description=long_desc,
     long_description_content_type="text/markdown",
@@ -27,7 +27,8 @@ setup(
         "concurrent_log_handler",
         "paramiko",
         "minio",
-        "fire"
+        "fire",
+        "fabric"
     ],
     include_package_data=True,
     packages=find_packages(),

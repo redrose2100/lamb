@@ -37,6 +37,7 @@ class SSHClient(object):
         self.__password = password
         self.__connect_timeout = connect_timeout
         self.__ssh = None
+        self.__is_active=False
     @property
     def ip(self):
         return self.__ip
@@ -44,6 +45,14 @@ class SSHClient(object):
     @property
     def port(self):
         return self.__port
+
+    @property
+    def username(self):
+        return self.__username
+
+    @property
+    def password(self):
+        return self.__password
 
     def wait_for_sshable(self, timeout=600):
         count=0
@@ -54,8 +63,8 @@ class SSHClient(object):
                     f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is in time {timeout} server cannot ssh.")
                 return False
             try:
-                if self.__connect():
-                    log.info(f" {self.__ip}:{self.__port} | server {self.__ip} can ssh: OK.")
+                output=self.exec("ls /").output
+                if "root" in output.strip():
                     return True
             except Exception as e:
                 log.warning(
@@ -64,9 +73,9 @@ class SSHClient(object):
 
     def exec(self, cmd, timeout=600):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
+        if not self.__is_active:
+            self.__connect()
         try:
-            if not self.__ssh.is_connected():
-                self.__connect()
             rs=self.__ssh.run(cmd)
             if rs.return_code == 0:
                 log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {rs.stdout.strip()}")
@@ -76,12 +85,13 @@ class SSHClient(object):
             new_rs = ExecResult(rs.stdout.strip(), rs.return_code)
             return new_rs
         except Exception as e:
-            log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
-            rs = ExecResult("", 255)
-            return rs
+            new_rs = ExecResult(str(e),255)
+            return new_rs
+
+
 
     def exec_interactive(self, cmd,promt_response=[]):
-        if not self.__ssh.is_connected():
+        if not self.__is_active:
             self.__connect()
         response_list=[]
         for elem in promt_response:
@@ -99,33 +109,23 @@ class SSHClient(object):
 
     def scp_to_remote(self, local_path, remote_path):
         log.info(
-            f" {self.__ip}:{self.__port} | Begin to copy file from local {local_path} to remote host {remote_path} ...")
-        try:
-            if not self.__ssh.is_connected():
-                self.__connect()
-            self.__ssh.put(local_path,remote_path)
-            log.info(
-                f" {self.__ip}:{self.__port} | Success to copy file from local {local_path} to remote host{remote_path}: OK.")
-        except Exception as e:
-            log.error(
-                f"{self.__ip}:{self.__port} | Failed to copy file from local {local_path} to remote host {remote_path}: Error. err msg is:{str(e)}")
-            raise e
+        f" {self.__ip}:{self.__port} | Begin to copy file from local {local_path} to remote host {remote_path} ...")
+        if not self.__is_active:
+            self.__connect()
+        self.__ssh.put(local_path,remote_path)
+        log.info(
+            f" {self.__ip}:{self.__port} | Success to copy file from local {local_path} to remote host{remote_path}: OK.")
 
     def scp_file_to_local(self, remote_path, local_path):
         log.info(
             f" {self.__ip}:{self.__port} | Begin to copy file from remote {remote_path} to local host {local_path} ...")
-        try:
-            if not self.__ssh.is_connected():
-                self.__connect()
-            if os.path.isfile(local_path):
-                os.system(f"rm -rf {local_path}")
-            self.__ssh.get(remote=remote_path,local=local_path)
-            log.info(
-                f" {self.__ip}:{self.__port} | Success to copy file from remote {remote_path} to local host{local_path}: OK.")
-        except Exception as e:
-            log.error(
-                f"{self.__ip}:{self.__port} | Failed to copy file from remote {remote_path} to local host {local_path}: Error. err msg is:{str(e)}")
-            raise e
+        if not self.__is_active:
+            self.__connect()
+        if os.path.isfile(local_path):
+            os.system(f"rm -rf {local_path}")
+        self.__ssh.get(remote=remote_path,local=local_path)
+        log.info(
+            f" {self.__ip}:{self.__port} | Success to copy file from remote {remote_path} to local host{local_path}: OK.")
 
     def __connect(self):
         log.info(f" {self.__ip}:{self.__port} | begin to create ssh connect...")
@@ -133,6 +133,7 @@ class SSHClient(object):
             self.__ssh = Connection(host=self.__ip, user=self.__username, connect_kwargs={"password": self.__password},
                       connect_timeout=self.__connect_timeout)
             log.info(f" {self.__ip}:{self.__port} | successful to create ssh connect: OK.")
+            self.__is_active=True
             return True
         except Exception as e:
             log.warning(f" {self.__ip}:{self.__port} | fail create ssh connect: Error.err msg is {str(e)}")
