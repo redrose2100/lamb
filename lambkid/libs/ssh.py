@@ -2,17 +2,35 @@ import os
 import re
 import time
 import paramiko
+import threading
 from lambkid import log
 import concurrent.futures
 
+class WorkerThread(threading.Thread):
+    def __init__(self, target,args):
+        super().__init__()
+        self.target = target
+        self.result = None
+        self.args = args
+
+    def run(self):
+        self.result = self.target(self.args)
+
 
 class ExecResult(object):
-    def __init__(self, output, exit_status_code):
+    def __init__(self, output, exit_status_code,stderr=""):
         self.__stdout = output
         self.__exit_status_code = exit_status_code
+        self.__stderr=stderr
 
     def __str__(self):
         return self.__stdout
+
+    def stdout(self):
+        return self.__stdout
+
+    def stderr(self):
+        return self.__stderr
 
     @property
     def output(self):
@@ -62,42 +80,84 @@ class SSHClient(object):
                     f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
             time.sleep(10)
 
-
-    def exec(self, cmd, timeout=600,max_attempts=1):
+    def _exec(self,cmd):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
         try:
-            try_times=0
+            if not self.__is_active():
+                self.wait_for_sshable()
+                self.__reconnect()
+                time.sleep(10)
+            transport = self.__ssh.get_transport()
+            channel = transport.open_session()
+            channel.get_pty()
+            channel.exec_command(cmd)
+            stdout_data = []
+            stderr_data = []
+
             while True:
-                try_times+=1
-                if try_times>(timeout/10):
-                    raise RuntimeError(f"after {timeout} seconds try, ssh is still not sshable.")
-                if not self.__is_active():
-                    self.__reconnect()
-                    time.sleep(10)
-                    continue
-                else:
+                if channel.recv_ready():
+                    stdout_data.append(channel.recv(1024).decode('utf-8'))
+                if channel.recv_stderr_ready():
+                    stderr_data.append(channel.recv_stderr(1024).decode('utf-8'))
+                if channel.exit_status_ready():
                     break
-            stdin, stdout, stderr = self.__ssh.exec_command(cmd, timeout=timeout)
-            start_time = time.time()
-            while not stdout.channel.exit_status_ready():
-                if time.time() - start_time > timeout:
-                    stdout.channel.close()
-                    stderr.channel.close()
-                    raise TimeoutError("The command timed out.")
-                time.sleep(0.1)  # 给其他任务一些时间
-            exit_status_code = stdout.channel.recv_exit_status()
-            output = stdout.read().decode("utf-8")
-            if exit_status_code == 0:
-                log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {output}")
-            else:
-                log.warning(
-                    f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {exit_status_code}, output is {output},")
-            rs = ExecResult(output, exit_status_code)
+                time.sleep(0.1)
+
+            exit_status = channel.recv_exit_status()
+            stdout = "".join(stdout_data)
+            stderr = "".join(stderr_data)
+            rs = ExecResult(stdout, exit_status, stderr)
             return rs
         except Exception as e:
             log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
             rs = ExecResult("", 255)
             return rs
+
+    def exec(self, cmd, timeout=600):
+        work=WorkerThread(target=self._exec,args=(cmd,))
+        work.start()
+        work.join(timeout)
+        if work.is_alive():
+            rs=ExecResult(f"Timeout Error: cmd not finish in {timeout} seconds.",255)
+        else:
+            rs=work.result
+        return rs
+
+    # def exec(self, cmd, timeout=600,max_attempts=1):
+    #     log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
+    #     try:
+    #         try_times=0
+    #         while True:
+    #             try_times+=1
+    #             if try_times>(timeout/10):
+    #                 raise RuntimeError(f"after {timeout} seconds try, ssh is still not sshable.")
+    #             if not self.__is_active():
+    #                 self.__reconnect()
+    #                 time.sleep(10)
+    #                 continue
+    #             else:
+    #                 break
+    #         stdin, stdout, stderr = self.__ssh.exec_command(cmd, timeout=timeout)
+    #         start_time = time.time()
+    #         while not stdout.channel.exit_status_ready():
+    #             if time.time() - start_time > timeout:
+    #                 stdout.channel.close()
+    #                 stderr.channel.close()
+    #                 raise TimeoutError("The command timed out.")
+    #             time.sleep(0.1)  # 给其他任务一些时间
+    #         exit_status_code = stdout.channel.recv_exit_status()
+    #         output = stdout.read().decode("utf-8")
+    #         if exit_status_code == 0:
+    #             log.info(f" {self.__ip}:{self.__port} | successful to run cmd {cmd}, output is {output}")
+    #         else:
+    #             log.warning(
+    #                 f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {exit_status_code}, output is {output},")
+    #         rs = ExecResult(output, exit_status_code)
+    #         return rs
+    #     except Exception as e:
+    #         log.error(f" {self.__ip}:{self.__port} | fail to run cmd {cmd}, err msg is {str(e)}")
+    #         rs = ExecResult("", 255)
+    #         return rs
 
     def exec_interactive(self, cmd_prompt):
         channel = self.__ssh.invoke_shell()
