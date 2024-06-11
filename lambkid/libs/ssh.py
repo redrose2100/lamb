@@ -81,7 +81,7 @@ class SSHClient(object):
             time.sleep(10)
 
     def _exec(self,cmd):
-        log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
+        log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}...")
         try:
             if not self.__is_active():
                 self.wait_for_sshable()
