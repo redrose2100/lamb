@@ -4,6 +4,13 @@ from pathlib import Path
 from lambkid import log
 
 def get_all_files(root_dir, recursive=True, suffix_tuple=()):
+    """
+        return all file path
+    :param root_dir:
+    :param recursive:
+    :param suffix_tuple:
+    :return:
+    """
     all_files = []
     if Path(root_dir).exists():
         if Path(root_dir).is_dir():
@@ -29,6 +36,43 @@ def get_all_files(root_dir, recursive=True, suffix_tuple=()):
             all_files.append(root_dir)
     return all_files
 
+
+def get_all_files_name(root_dir, recursive=True, suffix_tuple=()):
+    """
+        return all file path
+    :param root_dir:
+    :param recursive:
+    :param suffix_tuple:
+    :return:
+    """
+    all_files = []
+    if Path(root_dir).exists():
+        if Path(root_dir).is_dir():
+            if recursive:
+                for elem in Path(root_dir).glob("**/*"):
+                    if Path(elem).is_file():
+                        suffix = Path(elem).suffix
+                        if not suffix_tuple:
+                            if elem.name not in all_files:
+                                all_files.append(elem.name)
+                        else:
+                            if suffix in suffix_tuple:
+                                if elem.name not in all_files:
+                                    all_files.append(elem.name)
+            else:
+                for elem in Path(root_dir).iterdir():
+                    if Path(elem).is_file():
+                        suffix = Path(elem).suffix
+                        if not suffix_tuple:
+                            if elem.name not in all_files:
+                                all_files.append(elem.name)
+                        else:
+                            if suffix in suffix_tuple:
+                                if elem.name not in all_files:
+                                    all_files.append(elem.name)
+        else:
+            all_files.append(root_dir)
+    return all_files
 
 def write_csv(file_path, head=None, datas=None):
     try:
