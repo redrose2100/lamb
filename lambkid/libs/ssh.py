@@ -2,6 +2,8 @@ import os
 import re
 import time
 import traceback
+import threading
+import queue
 from lambkid import log
 from fabric import Connection
 from invoke import Responder
@@ -39,6 +41,7 @@ class SSHClient(object):
         self.__connect_timeout = connect_timeout
         self.__ssh = None
         self.__is_active=False
+        self.__q=None
     @property
     def ip(self):
         return self.__ip
@@ -71,7 +74,7 @@ class SSHClient(object):
                 log.warning(
                     f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
 
-    def exec(self, cmd, timeout=600):
+    def _exec(self, cmd):
         log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
         if not self.__is_active:
             self.__connect()
@@ -83,12 +86,21 @@ class SSHClient(object):
                 log.warning(
                     f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {rs.return_code}, output is {rs.stdout.strip()},")
             new_rs = ExecResult(rs.stdout.strip(), rs.return_code)
-            return new_rs
         except Exception as e:
             new_rs = ExecResult(str(e),255)
+        self.__q = queue.Queue()
+        self.__q.put(new_rs)
+
+    def exec(self, cmd, timeout=600):
+        try:
+            t=threading.Thread(target=self._exec,args=(cmd,))
+            t.start()
+            t.join(timeout)
+            rs=self.__q.get()
+            return rs
+        except Exception as e:
+            new_rs = ExecResult(f"Exception occure when run cmd {cmd}. err msg is {str(e)}.", 255)
             return new_rs
-
-
 
     def exec_interactive(self, cmd,promt_response=[]):
         if not self.__is_active:
