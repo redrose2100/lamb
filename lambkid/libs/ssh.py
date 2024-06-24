@@ -7,6 +7,7 @@ import queue
 from lambkid import log
 from fabric import Connection
 from invoke import Responder
+from func_timeout import func_set_timeout
 
 class ExecResult(object):
     def __init__(self, output, exit_status_code,stderr=""):
@@ -41,7 +42,6 @@ class SSHClient(object):
         self.__connect_timeout = connect_timeout
         self.__ssh = None
         self.__is_active=False
-        self.__q=None
     @property
     def ip(self):
         return self.__ip
@@ -73,9 +73,11 @@ class SSHClient(object):
             except Exception as e:
                 log.warning(
                     f" {self.__ip}:{self.__port} | server {self.__ip} can not ssh: Error. err msg is {str(e)}")
+            time.sleep(10)
 
+    @func_set_timeout(3600)
     def _exec(self, cmd):
-        log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}, timeout is {timeout}...")
+        log.info(f" {self.__ip}:{self.__port} | begin to run cmd {cmd}...")
         if not self.__is_active:
             self.__connect()
         try:
@@ -88,19 +90,10 @@ class SSHClient(object):
             new_rs = ExecResult(rs.stdout.strip(), rs.return_code)
         except Exception as e:
             new_rs = ExecResult(str(e),255)
-        self.__q = queue.Queue()
-        self.__q.put(new_rs)
+        return new_rs
 
-    def exec(self, cmd, timeout=600):
-        try:
-            t=threading.Thread(target=self._exec,args=(cmd,))
-            t.start()
-            t.join(timeout)
-            rs=self.__q.get()
-            return rs
-        except Exception as e:
-            new_rs = ExecResult(f"Exception occure when run cmd {cmd}. err msg is {str(e)}.", 255)
-            return new_rs
+    def exec(self, cmd,timeout=1800):
+        return self._exec(cmd)
 
     def exec_interactive(self, cmd,promt_response=[]):
         if not self.__is_active:
@@ -142,7 +135,7 @@ class SSHClient(object):
     def __connect(self):
         log.info(f" {self.__ip}:{self.__port} | begin to create ssh connect...")
         try:
-            self.__ssh = Connection(host=self.__ip, user=self.__username, connect_kwargs={"password": self.__password},
+            self.__ssh = Connection(host=self.__ip, port=self.__port, user=self.__username, connect_kwargs={"password": self.__password},
                       connect_timeout=self.__connect_timeout)
             log.info(f" {self.__ip}:{self.__port} | successful to create ssh connect: OK.")
             self.__is_active=True
