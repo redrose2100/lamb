@@ -89,6 +89,7 @@ class SSHClient(object):
                     f" {self.__ip}:{self.__port} | run cmd {cmd},exit_status_code is {rs.return_code}, output is {rs.stdout.strip()},")
             new_rs = ExecResult(rs.stdout.strip(), rs.return_code)
         except Exception as e:
+            self.__is_active = False
             new_rs = ExecResult(str(e),255)
         return new_rs
 
@@ -142,6 +143,7 @@ class SSHClient(object):
             return True
         except Exception as e:
             log.error(f" {self.__ip}:{self.__port} | fail create ssh connect: Error.err msg is {str(e)}",exc_info=True)
+            self.__is_active = False
             return False
 
     def __del__(self):
